@@ -1,0 +1,61 @@
+﻿<Window x:Class="WpfApp.MainWindow" x:Name="AppRoot" DataContext="{Binding ElementName=AppRoot}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp"
+        mc:Ignorable="d"
+        Title="SOme Graph" d:DesignHeight="450" d:DesignWidth="800">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="0,0,0,1">
+      <StackPanel Orientation="Horizontal">
+        <CheckBox IsChecked="{Binding IsPaused}" Content="_Pause" Margin="4,0"/>
+        <Label Content="_Max. Data Points" Target="{Binding ElementName=MaxPts}" VerticalAlignment="Center"/>
+        <TextBox x:Name="MaxPts" Text="{Binding MaxPoints}"/>
+      </StackPanel>
+    </Border>
+
+    <Grid Grid.Row="2">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition />
+        <ColumnDefinition Width="4" />
+        <ColumnDefinition Width="3*" />
+      </Grid.ColumnDefinitions>
+
+      <ListBox Grid.Column="0" ItemsSource="{Binding DataPoints}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="{x:Type local:DataPoint}">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+              </Grid.ColumnDefinitions>
+              <TextBlock Grid.Column="0">
+                <TextBlock Text="{Binding Timestamp.TimeOfDay, StringFormat='{}{0} '}" />
+                <TextBlock Text="{Binding Value, StringFormat='{}{0:.0000} '}" />
+              </TextBlock>
+              <ProgressBar Grid.Column="1" Maximum="1" Value="{Binding Value}" VerticalAlignment="Stretch" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+
+        <ItemsControl.ItemContainerStyle>
+          <Style TargetType="ListBoxItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+          </Style>
+        </ItemsControl.ItemContainerStyle>
+      </ListBox>
+
+      <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+
+      <local:GraphControl Grid.Column="2" Margin="20" BorderBrush="Gray" BorderThickness="1" DataPoints="{Binding DataPoints}"/>
+    </Grid>
+  </Grid>
+</Window>
