@@ -1,7 +1,10 @@
 ﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace WpfApp;
@@ -32,7 +35,7 @@ public partial class MainWindow : Window {
   #endregion // DependencyProperty IList<DataPoint> DataPoints
 
   readonly CancellationTokenSource _Cts = new();
-  Task _BackgroundTask;
+  Task _BackgroundTask = null!;
 
   public MainWindow() {
     DataPoints = new ObservableCollection<DataPoint>();
@@ -41,7 +44,17 @@ public partial class MainWindow : Window {
 
   protected override void OnInitialized(EventArgs e) {
     base.OnInitialized(e);
+    DataPointListBox.Loaded += loaded;
     _BackgroundTask = BackgroundTask(_Cts.Token);
+
+    void loaded(object sender, RoutedEventArgs e) {
+      var lb = (ItemsControl)sender!;
+      var border = (Border)VisualTreeHelper.GetChild(lb, 0);
+      var scrollViewer = (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
+      ((INotifyCollectionChanged)lb.Items).CollectionChanged += dataPointsChanged;
+
+      void dataPointsChanged(object? sender, NotifyCollectionChangedEventArgs e) => scrollViewer.ScrollToBottom();
+    }
   }
 
   protected override void OnClosing(CancelEventArgs e) {
@@ -51,6 +64,7 @@ public partial class MainWindow : Window {
 
   async Task BackgroundTask(CancellationToken ct) {
     try {
+      var value = 0.0;
       for (; !ct.IsCancellationRequested;) {
         await Task.Delay(500, ct);
         if (IsPaused)
@@ -59,9 +73,11 @@ public partial class MainWindow : Window {
         await Dispatcher.InvokeAsync(() => {
           while (DataPoints.Count > MaxPoints)
             DataPoints.RemoveAt(0);
+          value += Random.Shared.NextDouble();
+          value *= .5;
           DataPoints.Add(new() {
             Timestamp = now,
-            Value = Random.Shared.NextDouble()
+            Value = value,
           });
         }, DispatcherPriority.Background, ct);
       }

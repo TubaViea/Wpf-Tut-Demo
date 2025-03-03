@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp"
         mc:Ignorable="d"
-        Title="SOme Graph" d:DesignHeight="450" d:DesignWidth="800">
+        Title="Some Graph" d:DesignHeight="450" d:DesignWidth="800">
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
@@ -24,12 +24,12 @@
 
     <Grid Grid.Row="2">
       <Grid.ColumnDefinitions>
-        <ColumnDefinition />
+        <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="4" />
-        <ColumnDefinition Width="3*" />
+        <ColumnDefinition />
       </Grid.ColumnDefinitions>
 
-      <ListBox Grid.Column="0" ItemsSource="{Binding DataPoints}">
+      <ListBox Grid.Column="0" x:Name="DataPointListBox" ItemsSource="{Binding DataPoints}">
         <ItemsControl.ItemTemplate>
           <DataTemplate DataType="{x:Type local:DataPoint}">
             <Grid>
@@ -41,7 +41,9 @@
                 <TextBlock Text="{Binding Timestamp.TimeOfDay, StringFormat='{}{0} '}" />
                 <TextBlock Text="{Binding Value, StringFormat='{}{0:.0000} '}" />
               </TextBlock>
-              <ProgressBar Grid.Column="1" Maximum="1" Value="{Binding Value}" VerticalAlignment="Stretch" />
+              <ProgressBar Grid.Column="1" Maximum="1" MinWidth="60" Height="8"
+                           Background="{Binding Background, ElementName=AppRoot}"
+                           Value="{Binding Value}" />
             </Grid>
           </DataTemplate>
         </ItemsControl.ItemTemplate>
@@ -53,7 +55,7 @@
         </ItemsControl.ItemContainerStyle>
       </ListBox>
 
-      <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+      <GridSplitter Grid.Column="1"/>
 
       <local:GraphControl Grid.Column="2" Margin="20" BorderBrush="Gray" BorderThickness="1" DataPoints="{Binding DataPoints}"/>
     </Grid>
